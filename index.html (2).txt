@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA — Каталог книг</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        header {
+            background: #4338ca;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+        }
+
+        header p {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 10px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .tab:hover {
+            background: #e0e7ff;
+        }
+
+        .tab.active {
+            background: #4338ca;
+            color: white;
+        }
+
+        #content {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit, minmax(230px, 1fr)
+            );
+            gap: 20px;
+        }
+
+        .book {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #00000010;
+        }
+
+        .book h3 {
+            margin-top: 0;
+            color: #3730a3;
+        }
+
+        .book p {
+            line-height: 1.5;
+        }
+
+        .book-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 7px;
+            background: #4338ca;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #3730a3;
+        }
+
+        .btn.remove {
+            background: #dc2626;
+        }
+
+        .btn.remove:hover {
+            background: #b91c1c;
+        }
+
+        .info {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            line-height: 1.7;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 500px) {
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📚 Каталог книг</h1>
+    <p>Найди книгу по душе!</p>
+</header>
+
+<main class="container">
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="catalog">
+            Каталог
+        </button>
+
+        <button class="tab" data-tab="favorites">
+            Избранное (<span id="favCount">0</span>)
+        </button>
+
+        <button class="tab" data-tab="about">
+            О библиотеке
+        </button>
+    </nav>
+
+    <section id="content"></section>
+
+</main>
+
+<footer>
+    SPA-приложение «Каталог книг» · HTML, CSS, JavaScript
+</footer>
+
+<script>
+    // Данные библиотеки
+    const library = {
+        about: {
+            title: "О библиотеке",
+            description:
+                "Добро пожаловать в нашу электронную библиотеку!",
+            details:
+                "Здесь ты можешь познакомиться с интересными книгами, " +
+                "узнать об авторах и сохранять понравившиеся произведения " +
+                "в избранное.",
+            rules: [
+                "Просматривай доступные книги.",
+                "Добавляй интересные книги в избранное.",
+                "Удаляй книги из избранного в любое время."
+            ]
+        },
+
+        books: [
+            {
+                id: 1,
+                title: "Маленький принц",
+                author: "Антуан де Сент-Экзюпери",
+                year: 1943,
+                genre: "Сказка",
+                icon: "🌟"
+            },
+            {
+                id: 2,
+                title: "Преступление и наказание",
+                author: "Фёдор Достоевский",
+                year: 1866,
+                genre: "Роман",
+                icon: "📖"
+            },
+            {
+                id: 3,
+                title: "Мастер и Маргарита",
+                author: "Михаил Булгаков",
+                year: 1967,
+                genre: "Роман",
+                icon: "🐈‍⬛"
+            },
+            {
+                id: 4,
+                title: "Алиса в Стране чудес",
+                author: "Льюис Кэрролл",
+                year: 1865,
+                genre: "Фэнтези",
+                icon: "🐇"
+            },
+            {
+                id: 5,
+                title: "Три товарища",
+                author: "Эрих Мария Ремарк",
+                year: 1936,
+                genre: "Роман",
+                icon: "📚"
+            },
+            {
+                id: 6,
+                title: "Гарри Поттер",
+                author: "Дж. К. Роулинг",
+                year: 1997,
+                genre: "Фэнтези",
+                icon: "⚡"
+            }
+        ]
+    };
+
+    // Массив ID избранных книг
+    const favorites = new Set();
+
+    const content = document.getElementById("content");
+    const tabs = document.querySelectorAll(".tab");
+    const favCount = document.getElementById("favCount");
+
+    // Создание карточки книги
+    function createBookCard(book, isFavorite) {
+        return `
+            <article class="book">
+                <div class="book-icon">${book.icon}</div>
+
+                <h3>${book.title}</h3>
+
+                <p><b>Автор:</b> ${book.author}</p>
+                <p><b>Год:</b> ${book.year}</p>
+                <p><b>Жанр:</b> ${book.genre}</p>
+
+                <button
+                    class="btn ${isFavorite ? "remove" : ""}"
+                    data-action="${isFavorite ? "remove" : "add"}"
+                    data-id="${book.id}"
+                >
+                    ${isFavorite
+                        ? "♥ Удалить из избранного"
+                        : "♡ В избранное"}
+                </button>
+            </article>
+        `;
+    }
+
+    // Отображение каталога
+    function showCatalog() {
+        content.innerHTML = library.books
+            .map(book => createBookCard(
+                book,
+                favorites.has(book.id)
+            ))
+            .join("");
+    }
+
+    // Отображение избранных книг
+    function showFavorites() {
+        const books = library.books.filter(
+            book => favorites.has(book.id)
+        );
+
+        if (books.length === 0) {
+            content.innerHTML = `
+                <div class="empty">
+                    <h2>Пока здесь пусто 💔</h2>
+                    <p>
+                        Перейди в каталог и добавь любимые книги
+                        в избранное.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        content.innerHTML = books
+            .map(book => createBookCard(book, true))
+            .join("");
+    }
+
+    // Отображение информации о библиотеке
+    function showAbout() {
+        const data = library.about;
+
+        content.innerHTML = `
+            <div class="info">
+                <h2>${data.title}</h2>
+                <p>${data.description}</p>
+                <p>${data.details}</p>
+                <h3>Что можно делать?</h3>
+                <ul>
+                    ${data.rules.map(rule =>
+                        `<li>${rule}</li>`
+                    ).join("")}
+                </ul>
+            </div>
+        `;
+    }
+
+    // Переключение вкладок
+    function showTab(tabName) {
+        tabs.forEach(tab => {
+            tab.classList.toggle(
+                "active",
+                tab.dataset.tab === tabName
+            );
+        });
+
+        if (tabName === "catalog") {
+            showCatalog();
+        } else if (tabName === "favorites") {
+            showFavorites();
+        } else if (tabName === "about") {
+            showAbout();
+        }
+    }
+
+    // Обновление количества избранных книг
+    function updateFavoritesCount() {
+        favCount.textContent = favorites.size;
+    }
+
+    // Обработка нажатий на вкладки
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            showTab(tab.dataset.tab);
+        });
+    });
+
+    // Добавление и удаление книг через делегирование событий
+    content.addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+
+        if (!button) return;
+
+        const id = Number(button.dataset.id);
+
+        if (button.dataset.action === "add") {
+            favorites.add(id);
+        } else if (button.dataset.action === "remove") {
+            favorites.delete(id);
+        }
+
+        updateFavoritesCount();
+
+        // Перерисовываем текущую вкладку
+        const activeTab = document.querySelector(".tab.active");
+        showTab(activeTab.dataset.tab);
+    });
+
+    // Первоначальная загрузка
+    updateFavoritesCount();
+    showTab("catalog");
+</script>
+
+</body>
+</html>
